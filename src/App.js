@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Route } from 'react-router-dom';
+import Login from './components/Login';
+import Authenticate from './components/Authenticate';
+import User from './components/User';
 import './App.css';
 
 class App extends Component {
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <a href="https://github.com/login/oauth/authorize?client_id=8cb078e0f900fdb9a825&redirect_uri=http://localhost:8080/oauth/redirect">
-                        Login with github
-                    </a>
-                </header>
+                <Route path='/login' exact component={Login} />
+                <Route path='/authenticate' component={Authenticate} />
+                <Route path='/home' component={User} />
+                <Route path='/user/:user' component={User} />
             </div>
         );
     }

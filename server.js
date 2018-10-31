@@ -1,17 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const axios = require('axios')
+const jwt = require('jwt-simple')
 const path = require('path');
 const app = express();
 app.use(express.static(path.join(__dirname, 'build')));
 
 const clientID = process.env.GITHUB_CLIENT
 const clientSecret = process.env.GITHUB_SECRET
+const jwtSecret = process.env.JWT_SECRET
 
 app.get('/oauth/redirect', function (req, res) {
     const requestToken = req.query.code
-    const url = `https://github.com/login/oauth/access_token?client_id=${clientID}&client_secret=${clientSecret}&code=${requestToken}`
-    console.log('hello im here', url)
+    res.redirect(`/authenticate?request_token=${requestToken}`)
+})
+
+app.get('/userdetails/:code', function (req, res) {
+    const requestToken = req.params.code
     axios({
         method: 'post',
         url: `https://github.com/login/oauth/access_token?client_id=${clientID}&client_secret=${clientSecret}&code=${requestToken}`,
@@ -20,8 +25,32 @@ app.get('/oauth/redirect', function (req, res) {
         }
     }).then((response) => {
         const accessToken = response.data.access_token
-        res.redirect(`/home?access_token=${accessToken}`)
+        if (accessToken) {
+            axios({
+                method: 'get',
+                url: 'http://api.github.com/user',
+                headers: {
+                    Authorization: 'token ' + accessToken
+                }
+            })
+            .then(userResponse => {
+                if (userResponse.data && userResponse.data.login) {
+                    const payload = { login: userResponse.data.login }
+                    res.status(200).json({ jwt: jwt.encode(payload, jwtSecret) })
+                }
+                else res.status(401).json({})
+            })
+        } else {
+            res.status(401).json({})
+        }
     })
+})
+
+app.get('/verify/:jwt', function (req, res) {
+    const decodedJwt = decodeURI(req.params.jwt)
+    const decoded = jwt.decode(decodedJwt, jwtSecret)
+    if (decoded.login) res.status(200).json({ authenticated: true, login: decoded.login })
+    else res.status(401).json({})
 })
 
 app.get('/*', function (req, res) {
