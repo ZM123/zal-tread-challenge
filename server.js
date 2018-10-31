@@ -36,7 +36,7 @@ app.get('/userdetails/:code', function (req, res) {
             .then(userResponse => {
                 if (userResponse.data && userResponse.data.login) {
                     const payload = { login: userResponse.data.login }
-                    res.status(200).json({ jwt: jwt.encode(payload, jwtSecret) })
+                    res.status(200).json({ jwt: jwt.encode(payload, jwtSecret), login: userResponse.data.login })
                 }
                 else res.status(401).json({})
             })
@@ -51,6 +51,26 @@ app.get('/verify/:jwt', function (req, res) {
     const decoded = jwt.decode(decodedJwt, jwtSecret)
     if (decoded.login) res.status(200).json({ authenticated: true, login: decoded.login })
     else res.status(401).json({})
+})
+
+app.post('/addlink', function (req, res) {
+    // add a link to user (linkurl, hash)
+})
+
+app.post('/deletelink', function (req, res) {
+    // delete a link
+})
+
+app.get('/links/:user', function (req, res) {
+    // return user's links
+})
+
+app.get('/shorten/:link', function (req, res) {
+    // return shortened link
+})
+
+app.get('/lengthen/:link', function (req, res) {
+    // return lengthened link
 })
 
 app.get('/*', function (req, res) {

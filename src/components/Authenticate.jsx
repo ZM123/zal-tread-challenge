@@ -5,12 +5,20 @@ class Authenticate extends Component {
         const query = window.location.search.substring(1)
         const token = query.split('request_token=')[1]
 
-        fetch(`/userdetails/${token}`)
-        .then(res => res.json())
-        .then(res => {
-            if (res.jwt) localStorage.setItem("jwt", res.jwt)
-            this.props.history.push('/home')
-        })
+        if (token) {
+            fetch(`/userdetails/${token}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.jwt) {
+                    localStorage.setItem("jwt", res.jwt)
+                    this.props.history.push(`/user/${res.login}`)
+                } else {
+                    this.props.history.push('/login')
+                }
+            })
+        } else {
+            this.props.history.push('/login')
+        }
     }
 
     render() {
