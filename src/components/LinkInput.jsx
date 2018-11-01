@@ -17,6 +17,7 @@ class LinkInput extends Component {
     handleSubmit(event) {
         alert('Adding link ' + this.state.value);
         api.postLink(this.props.user, this.state.value);
+        this.props.onSubmit()
         this.setState({value: ''})
         event.preventDefault();
     }

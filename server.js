@@ -15,6 +15,10 @@ const clientSecret = process.env.GITHUB_SECRET
 const jwtSecret = process.env.JWT_SECRET
 
 var db = TAFFY([{ id: 'shorts', shortToLong: {} }, { id: 'longs', longToShort: {} }]);
+db.insert({
+    user: 'test',
+    links: ['https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Stroop_Report_-_Warsaw_Ghetto_Uprising_BW.jpg/120px-Stroop_Report_-_Warsaw_Ghetto_Uprising_BW.jpg', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Adelie_Penguins_on_iceberg.jpg/420px-Adelie_Penguins_on_iceberg.jpg']
+})
 
 app.get('/oauth/redirect', function (req, res) {
     const requestToken = req.query.code
@@ -60,7 +64,8 @@ app.get('/verify/:jwt', function (req, res) {
 })
 
 app.post('/addlink', function (req, res) {
-    const { user, link } = req.body
+    let { user, link } = req.body
+    link = decodeURI(link)
     const userRecord = db({ user }).first()
     if (userRecord && userRecord.links) {
         if (!userRecord.links.includes(link)) {
@@ -99,13 +104,27 @@ app.post('/addlink', function (req, res) {
 })
 
 app.post('/deletelink', function (req, res) {
-    // delete a link
+    const { user, link } = req.body
+    const userRecord = db({ user }).first()
+    if (userRecord && userRecord.links) {
+        if (userRecord.links.indexOf(link) > -1) {
+            let newLinks = userRecord.links.slice(0)
+            newLinks.splice(userRecord.links.indexOf(link), 1)
+            db({ user }).update({ links: newLinks })
+            console.log('deleted link ' + link + ' for user ' + user)
+            res.status(200)
+        } else {
+            res.status(400)
+        }
+    } else {
+        res.status(400)
+    }
 })
 
 app.get('/links/:user', function (req, res) {
     const user = req.params.user
     if (user) {
-        const userRecord = db({ user })
+        const userRecord = db({ user }).first()
         if (userRecord && userRecord.links) res.status(200).json(userRecord.links)
         else res.status(400).json([])
     } else {
@@ -114,11 +133,19 @@ app.get('/links/:user', function (req, res) {
 })
 
 app.get('/shorten/:link', function (req, res) {
-    // return shortened link
+    const link = decodeURIComponent(req.params.link);
+    const shortLink = db({ id: 'longs' }).first().longToShort[link]
+    if (shortLink) {
+        console.log('return shortened link ' + shortLink + ' for link ' + link)
+        res.status(200).json({ link: `http://localhost:8080/img/${shortLink}` })
+    } else res.status(400).json({ link })
 })
 
-app.get('/lengthen/:link', function (req, res) {
-    // return lengthened link
+app.get('/img/:link', function (req, res) {
+    const link = req.params.link;
+    const fullLink = db({ id: 'shorts' }).first().shortToLong[link]
+    if (fullLink) res.redirect(fullLink)
+    else res.redirect('/login')
 })
 
 app.get('/*', function (req, res) {

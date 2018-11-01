@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import LinkInput from './LinkInput';
 import ImageScroller from './ImageScroller';
+import api from '../API';
 
 class User extends Component {
     constructor() {
         super();
         this.state = {
-            authenticated: false
+            authenticated: false,
+            links: []
         };
     }
 
@@ -29,10 +31,16 @@ class User extends Component {
                 }
             })
         }
+        this.getUserLinks(this.props.match.params.user)
     }
 
     isOwnPage(userPage) {
         return this.state.authenticated && this.state.login === userPage
+    }
+
+    async getUserLinks(user) {
+        const links = await api.getLinks(user)
+        this.setState({ links })
     }
 
     render() {
@@ -40,8 +48,8 @@ class User extends Component {
         return (
             <div className="User">
                 <span className="user__title">{userPage}</span>
-                {this.isOwnPage(userPage) && <LinkInput user={this.state.login} />}
-                <ImageScroller />
+                {this.isOwnPage(userPage) && <LinkInput user={this.state.login} onSubmit={() => this.getUserLinks(userPage)} />}
+                <ImageScroller links={this.state.links} onChange={() => this.getUserLinks(userPage)} user={this.state.login} editable={this.isOwnPage(userPage)} />
             </div>
         );
     }
