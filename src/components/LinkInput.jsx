@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import api from '../API.js';
 
 class LinkInput extends Component {
     constructor(props) {
@@ -14,7 +15,8 @@ class LinkInput extends Component {
     }
 
     handleSubmit(event) {
-        alert('Submitting link for ' + this.props.user + ' image is ' + this.state.value);
+        alert('Adding link ' + this.state.value);
+        api.postLink(this.props.user, this.state.value);
         this.setState({value: ''})
         event.preventDefault();
     }
