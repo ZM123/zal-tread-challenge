@@ -125,6 +125,8 @@ app.get('/links/:user', function (req, res) {
     const user = req.params.user
     if (user) {
         const userRecord = db({ user }).first()
+        // Ideally, this response would be paginated and the endpoint would accept a page parameter
+        // However, I felt that was out of scope for a challenge of this size
         if (userRecord && userRecord.links) res.status(200).json(userRecord.links)
         else res.status(400).json([])
     } else {
