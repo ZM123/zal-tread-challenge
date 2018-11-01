@@ -65,7 +65,7 @@ app.get('/verify/:jwt', function (req, res) {
 
 app.post('/addlink', function (req, res) {
     let { user, link } = req.body
-    link = decodeURI(link)
+    link = decodeURIComponent(link)
     const userRecord = db({ user }).first()
     if (userRecord && userRecord.links) {
         if (!userRecord.links.includes(link)) {
