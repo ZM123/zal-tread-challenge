@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import LinkInput from './LinkInput';
 import ImageScroller from './ImageScroller';
 import api from '../API';
+import '../css/User.css';
 
 class User extends Component {
     constructor() {
@@ -47,7 +48,7 @@ class User extends Component {
         let userPage = this.props.match.params.user
         return (
             <div className="User">
-                <span className="user__title">{userPage}</span>
+                <span className="User__title">{userPage}</span>
                 {this.isOwnPage(userPage) && <LinkInput user={this.state.login} onSubmit={() => this.getUserLinks(userPage)} />}
                 <ImageScroller links={this.state.links} onChange={() => this.getUserLinks(userPage)} user={this.state.login} editable={this.isOwnPage(userPage)} />
             </div>

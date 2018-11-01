@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import api from '../API';
+import '../css/Image.css';
 
 class Image extends Component {
     constructor(props) {
@@ -22,8 +23,8 @@ class Image extends Component {
     render() {
         return (
             <div className="Image">
-                <img src={this.props.src} alt="User image" />
-                {this.props.editable && <div className="Image__buttons-container">
+                <img className="Image__picture" src={this.props.src} alt={this.props.user} />
+                {this.props.editable && <div>
                     <button onClick={this.alertShortLink}>🔗</button>
                     <button onClick={this.deleteImage}>🗑</button>
                 </div>}

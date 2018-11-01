@@ -1,0 +1,10 @@
+.User {
+    background-color: #282c34;
+    min-height: 100vh;
+}
+
+.User__title {
+    font-size: 4em;
+    color: white;
+    margin-bottom: 10px;
+}

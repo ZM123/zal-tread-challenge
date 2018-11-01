@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import api from '../API.js';
+import '../css/LinkInput.css';
 
 class LinkInput extends Component {
     constructor(props) {
@@ -26,7 +27,7 @@ class LinkInput extends Component {
         return (
             <div className="LinkInput">
                 <form onSubmit={this.handleSubmit}>
-                    <span>Add an image</span>
+                    <span className="LinkInput__label">Add an image</span>
                     <input type="text" value={this.state.value} onChange={this.handleChange}/>
                 </form>
             </div>
